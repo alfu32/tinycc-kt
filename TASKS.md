@@ -2,10 +2,10 @@
 
 ## Status report
 
-- **DONE:** 6
+- **DONE:** 7
 - **DOING:** 1
-- **TODO:** 32
-- **Last updated:** 2026-10-09T17:13:12Z
+- **TODO:** 31
+- **Last updated:** 2026-10-09T17:14:49Z
 - **Counting rule:** counts include every task and subtask record, including parent workstreams.
 
 ## Tasks
@@ -54,10 +54,10 @@
 
 #### T010.3 — Define out-of-box macOS target support
 
-- **Status:** TODO
-- **begin_datetime:** null
-- **resolution_datetime:** null
-- **Notes:** Determine whether a project-owned limited sysroot can meet the required C profile without distributing Apple's SDK; otherwise define the supplied-SDK boundary.
+- **Status:** DONE
+- **begin_datetime:** 2026-10-09T17:14:27Z
+- **resolution_datetime:** 2026-10-09T17:14:49Z
+- **Notes:** Defined Darwin support as requiring a locally installed Apple SDK. Command Line Tools avoid requiring the full Xcode app, but include the same macOS SDK and must still be installed. Apple's agreement blocks bundling the SDK or using it on non-Apple hosts; matrix narrowed to 31 legally valid pairs.
 
 #### T010.4 — Finalize Linux host FFI ABI variants
 

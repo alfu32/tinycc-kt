@@ -6,14 +6,14 @@ The repository currently has no Gradle build, Kotlin compiler entry point, or na
 
 ## Matrix
 
-`matrix.toml` defines six host OS/architecture profiles and six target profiles. The intended initial action set is the valid Cartesian product, 6 × 6 = 36 host-target pairs. Target ABI dependencies are attached to target profiles; native ABI dependencies are attached to the host package. A pair's dependency set is the union of its host and target requirements.
+`matrix.toml` defines six host OS/architecture profiles and six target profiles. The valid initial action set contains 31 pairs: all 30 Linux/Windows target combinations plus the native macOS-host to Darwin-target pair. Apple SDK terms restrict use of that SDK to Apple-branded macOS hardware, so the public matrix does not cross-build Darwin from Linux or Windows. Target ABI dependencies are attached to target profiles; native ABI dependencies are attached to the host package. A pair's dependency set is the union of its host and target requirements.
 
 Linux FFI shared libraries need extra care. A shared object loaded into a JVM/Python process must match that process's libc. Each Linux host package therefore needs glibc and musl bridge variants if both JVM environments are in scope. The standalone Clang/LLD executables can be built as static musl executables to avoid a glibc dependency. This libc split does not create extra host-target pairs; it creates two FFI bridge files inside each Linux host package.
 
 The target profiles record a Windows ABI decision and a macOS SDK distribution gate:
 
 * **Windows:** Use the GNU Windows ABI with MinGW-w64 headers/startup objects and UCRT. LLVM-MinGW publishes Linux cross-toolchains for Windows x86_64 and AArch64, and documents UCRT as its primary runtime choice. UCRT is present in Windows 10 and later, which becomes our minimum Windows target. Microsoft permits redistribution of specified Visual Studio files but says not all files can be redistributed, so the MSVC sysroot remains deferred pending file-by-file license review. This is a conservative packaging decision, not a legal determination. See [Microsoft's redistribution list](https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution), [DLL redistribution guidance](https://learn.microsoft.com/en-us/cpp/windows/determining-which-dlls-to-redistribute?view=msvc-170), and [LLVM-MinGW](https://github.com/mstorsjo/llvm-mingw).
-* **macOS:** cross-linking normal hosted C programs needs macOS SDK headers and `libSystem` link stubs. GitHub's macOS runner can supply an SDK for CI, but that does not grant permission to place the SDK in our release. Until an allowed, project-owned replacement sysroot exists, the macOS target is marked `sdk_gate`; it cannot honestly be advertised as out-of-the-box on non-Mac hosts.
+* **macOS:** normal hosted C programs need macOS SDK headers and `libSystem` link stubs. Apple's [Xcode and SDK agreement](https://www.apple.com/legal/sla/docs/xcode.pdf) restricts SDK use to Apple-branded Macs and does not grant redistribution rights, so the package cannot include the SDK and a Darwin build cannot run legally on a non-Apple host. Apple offers [Command Line Tools for Xcode](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools) separately from the full Xcode app; that installer includes the same macOS SDK and toolchain. Therefore a Mac user can avoid installing the full Xcode app, but must install Command Line Tools or supply an already licensed SDK. The compiler will report a missing-SDK error when neither is available. This is not a fully offline macOS target.
 
 Linux targets are the first fully specified target family. Build each musl sysroot from the musl source and build the matching compiler-rt builtins from the pinned LLVM source. Pin source revisions, checksums, and build options in the eventual lock file; never resolve `latest` during a release build.
 
@@ -27,7 +27,7 @@ Linux targets are the first fully specified target family. Build each musl sysro
 | Linux C runtime | Pinned source from [musl](https://git.musl-libc.org/cgit/musl/) | Build headers, startup objects, libc, and linker metadata for x86_64, AArch64, and RISC-V 64. Record the RISC-V ISA/ABI baseline in the target profile. |
 | Windows GNU/UCRT target sysroot | Pinned [LLVM-MinGW](https://github.com/mstorsjo/llvm-mingw), [mingw-w64](https://www.mingw-w64.org/), and LLVM sources | Build x86_64 and AArch64 target headers, startup objects, import libraries, and compiler-rt. Target Windows 10 or later, where UCRT is present. |
 | Deferred Windows MSVC sysroot | Windows SDK and Visual Studio Build Tools components from Microsoft's official distribution channels | Do not include in release packages until a file-by-file redistribution review clears all shipped headers, libraries, and runtime files. |
-| macOS SDK | Xcode image on a macOS GitHub runner, for CI-only validation | Do not include it in release artifacts unless Apple licensing permits that distribution. A custom public-API subset would be a separately scoped target profile. |
+| macOS SDK | Apple Command Line Tools or Xcode on a macOS runner/user machine | Use the SDK locally for Darwin compilation; never include it in release artifacts. Users need Command Line Tools or another valid local SDK installation. |
 
 ## Host build requirements
 
@@ -36,7 +36,7 @@ Linux targets are the first fully specified target family. Build each musl sysro
 | `linux-x86_64` | `ubuntu-24.04` | JDK; Linux-native FFI bridge built for glibc and musl; static-musl host tools. |
 | `linux-aarch64` | `ubuntu-24.04-arm` | JDK; AArch64 FFI bridge built for glibc and musl; static-musl host tools. |
 | `linux-riscv64` | No hosted RISC-V runner currently listed | Cross-build the host tools and bridge from an x64/ARM64 Linux runner with a pinned RISC-V sysroot; execute smoke tests under QEMU or on a self-hosted RISC-V runner. |
-| `macos-aarch64` | `macos-15` (ARM64) | JDK; native Mach-O FFI bridge and host tools. Xcode is a CI input only unless separately licensed for redistribution. |
+| `macos-aarch64` | `macos-15` (ARM64) | JDK; native Mach-O FFI bridge and host tools. Use the runner SDK for macOS-to-Darwin builds; never package it. |
 | `windows-x86_64` | `windows-2025` | JDK; native PE/COFF FFI bridge and host tools. |
 | `windows-aarch64` | `windows-11-arm` | JDK; native ARM64 PE/COFF FFI bridge and host tools. |
 

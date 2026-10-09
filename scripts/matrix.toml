@@ -100,9 +100,11 @@ os = "macos"
 arch = "aarch64"
 abi = "darwin"
 llvm_triple_form = "arm64-apple-macosx<minimum-version>"
-status = "sdk-redistribution-gate"
-provision_from = ["Xcode/macOS SDK on GitHub macOS runner (CI-only pending rights review)", "https://github.com/llvm/llvm-project"]
-requires = ["macOS SDK headers", "libSystem .tbd link stubs", "deployment target", "LLD Mach-O support"]
+status = "external-sdk-required"
+allowed_hosts = ["macos_aarch64"]
+sdk_distribution = "not-redistributable"
+provision_from = ["Apple Command Line Tools or Xcode on macOS (user/runner supplied)", "https://github.com/llvm/llvm-project"]
+requires = ["locally supplied macOS SDK headers", "libSystem .tbd link stubs", "deployment target", "LLD Mach-O support"]
 
 [deferred_targets.windows_x86_64_msvc]
 os = "windows"
@@ -120,7 +122,7 @@ llvm_triple = "aarch64-pc-windows-msvc"
 status = "deferred-redistribution-review"
 requires = ["Windows ARM64 SDK headers/import libraries", "UCRT headers/libraries", "VCRuntime ARM64 headers/libraries", "compiler-rt builtins", "LLD COFF support"]
 
-# Explicit valid Cartesian product: 6 hosts × 6 target profiles.
+# Explicit valid pair matrix: 30 Linux/Windows target pairs plus the native macOS-to-Darwin pair.
 [matrix]
 pairs = [
   { host = "linux_x86_64", target = "linux_x86_64_musl" },
@@ -128,19 +130,16 @@ pairs = [
   { host = "linux_x86_64", target = "linux_riscv64_musl" },
   { host = "linux_x86_64", target = "windows_x86_64_mingw_ucrt" },
   { host = "linux_x86_64", target = "windows_aarch64_mingw_ucrt" },
-  { host = "linux_x86_64", target = "macos_aarch64_darwin" },
   { host = "linux_aarch64", target = "linux_x86_64_musl" },
   { host = "linux_aarch64", target = "linux_aarch64_musl" },
   { host = "linux_aarch64", target = "linux_riscv64_musl" },
   { host = "linux_aarch64", target = "windows_x86_64_mingw_ucrt" },
   { host = "linux_aarch64", target = "windows_aarch64_mingw_ucrt" },
-  { host = "linux_aarch64", target = "macos_aarch64_darwin" },
   { host = "linux_riscv64", target = "linux_x86_64_musl" },
   { host = "linux_riscv64", target = "linux_aarch64_musl" },
   { host = "linux_riscv64", target = "linux_riscv64_musl" },
   { host = "linux_riscv64", target = "windows_x86_64_mingw_ucrt" },
   { host = "linux_riscv64", target = "windows_aarch64_mingw_ucrt" },
-  { host = "linux_riscv64", target = "macos_aarch64_darwin" },
   { host = "macos_aarch64", target = "linux_x86_64_musl" },
   { host = "macos_aarch64", target = "linux_aarch64_musl" },
   { host = "macos_aarch64", target = "linux_riscv64_musl" },
@@ -152,11 +151,9 @@ pairs = [
   { host = "windows_x86_64", target = "linux_riscv64_musl" },
   { host = "windows_x86_64", target = "windows_x86_64_mingw_ucrt" },
   { host = "windows_x86_64", target = "windows_aarch64_mingw_ucrt" },
-  { host = "windows_x86_64", target = "macos_aarch64_darwin" },
   { host = "windows_aarch64", target = "linux_x86_64_musl" },
   { host = "windows_aarch64", target = "linux_aarch64_musl" },
   { host = "windows_aarch64", target = "linux_riscv64_musl" },
   { host = "windows_aarch64", target = "windows_x86_64_mingw_ucrt" },
   { host = "windows_aarch64", target = "windows_aarch64_mingw_ucrt" },
-  { host = "windows_aarch64", target = "macos_aarch64_darwin" },
 ]
