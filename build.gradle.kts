@@ -20,6 +20,7 @@ application {
 tasks.named<Jar>("jar") {
     manifest {
         attributes["Main-Class"] = application.mainClass.get()
+        attributes["Implementation-Version"] = project.version.toString()
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     isPreserveFileTimestamps = false
@@ -43,6 +44,7 @@ tasks.register<Jar>("autonomousJar") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes["Main-Class"] = application.mainClass.get()
+        attributes["Implementation-Version"] = project.version.toString()
     }
     isPreserveFileTimestamps = false
     isReproducibleFileOrder = true

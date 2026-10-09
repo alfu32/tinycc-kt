@@ -2,10 +2,10 @@
 
 ## Status report
 
-- **DONE:** 11
+- **DONE:** 12
 - **DOING:** 1
-- **TODO:** 28
-- **Last updated:** 2026-10-09T17:20:32Z
+- **TODO:** 27
+- **Last updated:** 2026-10-09T17:23:21Z
 - **Counting rule:** counts include every task and subtask record, including parent workstreams.
 
 ## Tasks
@@ -81,9 +81,10 @@
 
 #### T020.2 — Define the compiler request/result API and CLI
 
-- **Status:** TODO
-- **begin_datetime:** null
-- **resolution_datetime:** null
+- **Status:** DONE
+- **begin_datetime:** 2026-10-09T17:21:20Z
+- **resolution_datetime:** 2026-10-09T17:23:21Z
+- **Notes:** Added Kotlin request/result models, target profiles, a CCompiler interface, and a parser for target selection and common C options. Help, version, target listing, and structured toolchain-unavailable results work; backend compilation remains for later tasks.
 
 #### T020.3 — Define the stable C ABI and JVM bridge lifecycle
 
