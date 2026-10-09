@@ -2,10 +2,10 @@
 
 ## Status report
 
-- **DONE:** 10
-- **DOING:** 0
-- **TODO:** 30
-- **Last updated:** 2026-10-09T17:16:40Z
+- **DONE:** 11
+- **DOING:** 1
+- **TODO:** 28
+- **Last updated:** 2026-10-09T17:20:32Z
 - **Counting rule:** counts include every task and subtask record, including parent workstreams.
 
 ## Tasks
@@ -68,15 +68,16 @@
 
 ### T020 — Establish the Kotlin/JVM application and API
 
-- **Status:** TODO
-- **begin_datetime:** null
+- **Status:** DOING
+- **begin_datetime:** 2026-10-09T17:17:53Z
 - **resolution_datetime:** null
 
 #### T020.1 — Create the Gradle Kotlin DSL project and distribution task
 
-- **Status:** TODO
-- **begin_datetime:** null
-- **resolution_datetime:** null
+- **Status:** DONE
+- **begin_datetime:** 2026-10-09T17:17:53Z
+- **resolution_datetime:** 2026-10-09T17:20:32Z
+- **Notes:** Added the Gradle Kotlin DSL/JVM 17 project, wrapper, runnable fat JAR, and gated autonomousJar bundle task. compileKotlin and jar completed; launching the JAR with --version printed the expected version.
 
 #### T020.2 — Define the compiler request/result API and CLI
 
