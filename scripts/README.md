@@ -8,7 +8,7 @@ The repository currently has no Gradle build, Kotlin compiler entry point, or na
 
 `matrix.toml` defines six host OS/architecture profiles and six target profiles. The valid initial action set contains 31 pairs: all 30 Linux/Windows target combinations plus the native macOS-host to Darwin-target pair. Apple SDK terms restrict use of that SDK to Apple-branded macOS hardware, so the public matrix does not cross-build Darwin from Linux or Windows. Target ABI dependencies are attached to target profiles; native ABI dependencies are attached to the host package. A pair's dependency set is the union of its host and target requirements.
 
-Linux FFI libraries must match the libc used by the hosting JVM or FFI caller. Ship two bridge variants for every Linux host architecture: one built for glibc and one for musl; do not try to make a single shared object span both ABIs. The Kotlin loader detects the process libc from `/proc/self/maps` (glibc's libc.so.6 versus musl's libc.musl-*.so.1). The `tinycc.native.libc=glibc|musl` system property overrides detection. If procfs is unavailable and no override is supplied, fail with a diagnostic instead of guessing. The standalone Clang/LLD executables remain static musl builds. These variants add files within each host package, not host-target pairs.
+Linux FFI libraries must match the libc used by the hosting JVM or native caller. Build separate bridge variants for glibc and musl for every Linux host architecture. A managed JVM binding can detect libc from /proc/self/maps (glibc's libc.so.6 versus musl's libc.musl-*.so.1) and accept the tinycc.native.libc system-property override. Direct native FFI callers must load the matching variant. The bridge uses host process APIs to launch Java and does not link against JNI or the JVM. Standalone Clang/LLD executables remain static musl builds; the extra bridge variants do not create extra host-target pairs.
 
 The target profiles record a Windows ABI decision and a macOS SDK distribution gate:
 
@@ -22,7 +22,7 @@ Linux targets are the first fully specified target family. Build each musl sysro
 | Component | Provision from | Notes |
 |---|---|---|
 | Kotlin/JVM compiler application | This repository's Gradle distribution task (to be added) | The JAR is host-independent. The build currently does not exist. |
-| JNI/FFI bridge headers and JVM ABI | Eclipse Temurin JDK from [Adoptium](https://adoptium.net/temurin/releases/) in CI | Build one bridge per native host ABI. The end-user JVM remains a runtime requirement. |
+| Native FFI launcher bridge | C source under src/main/native, compiled with the host toolchain | Exports tinycc_main and launches the Java JAR as a child process; no JNI headers or JVM linkage. Build glibc and musl variants for Linux hosts. |
 | Clang, LLVM backends, LLD, compiler-rt | Pinned release/source from [llvm/llvm-project](https://github.com/llvm/llvm-project) | Build a host-native tool bundle with X86, AArch64, and RISCV backends. |
 | Linux C runtime | Pinned source from [musl](https://git.musl-libc.org/cgit/musl/) | Build headers, startup objects, libc, and linker metadata for x86_64, AArch64, and RISC-V 64. Record the RISC-V ISA/ABI baseline in the target profile. |
 | Windows GNU/UCRT target sysroot | Pinned [LLVM-MinGW](https://github.com/mstorsjo/llvm-mingw), [mingw-w64](https://www.mingw-w64.org/), and LLVM sources | Build x86_64 and AArch64 target headers, startup objects, import libraries, and compiler-rt. Target Windows 10 or later, where UCRT is present. |
@@ -33,12 +33,12 @@ Linux targets are the first fully specified target family. Build each musl sysro
 
 | Host profile | GitHub Actions runner | Host-specific build inputs |
 |---|---|---|
-| `linux-x86_64` | `ubuntu-24.04` | JDK; Linux-native FFI bridge built for glibc and musl; static-musl host tools. |
-| `linux-aarch64` | `ubuntu-24.04-arm` | JDK; AArch64 FFI bridge built for glibc and musl; static-musl host tools. |
+| `linux-x86_64` | `ubuntu-24.04` | JDK 17 for the Kotlin app; native FFI bridge built for glibc and musl; static-musl host tools. |
+| `linux-aarch64` | `ubuntu-24.04-arm` | JDK 17 for the Kotlin app; AArch64 FFI bridge built for glibc and musl; static-musl host tools. |
 | `linux-riscv64` | No hosted RISC-V runner currently listed | Cross-build the host tools and bridge from an x64/ARM64 Linux runner with a pinned RISC-V sysroot; execute smoke tests under QEMU or on a self-hosted RISC-V runner. |
-| `macos-aarch64` | `macos-15` (ARM64) | JDK; native Mach-O FFI bridge and host tools. Use the runner SDK for macOS-to-Darwin builds; never package it. |
-| `windows-x86_64` | `windows-2025` | JDK; native PE/COFF FFI bridge and host tools. |
-| `windows-aarch64` | `windows-11-arm` | JDK; native ARM64 PE/COFF FFI bridge and host tools. |
+| `macos-aarch64` | `macos-15` (ARM64) | JDK 17 for the Kotlin app; native Mach-O FFI bridge and host tools. Use the runner SDK for macOS-to-Darwin builds; never package it. |
+| `windows-x86_64` | `windows-2025` | JDK 17 for the Kotlin app; native PE/COFF FFI bridge and host tools. |
+| `windows-aarch64` | `windows-11-arm` | JDK 17 for the Kotlin app; native ARM64 PE/COFF FFI bridge and host tools. |
 
 Runner labels are an initial mapping and must be checked against the repository's GitHub plan when workflows are enabled. GitHub's runner reference currently lists Linux, Windows, and macOS hosted runners for x64 and ARM64; it does not list a RISC-V hosted runner.
 

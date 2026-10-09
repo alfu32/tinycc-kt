@@ -24,6 +24,8 @@ The Kotlin API is in package org.tinycc.api. Callers construct a CompilationRequ
 
 The CLI and API contracts are present, but compilation returns a toolchain-unavailable diagnostic until the native backend bundle is implemented.
 
+The host-specific native FFI contract and its tinycc_main(argc, argv) entry point are documented in [docs/ffi-abi.md](docs/ffi-abi.md).
+
 The autonomousJar task creates the all-in-one runnable JAR after a complete toolchain bundle has been staged at build/autonomous-bundle/:
 
     ./gradlew autonomousJar

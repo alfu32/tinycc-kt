@@ -2,10 +2,10 @@
 
 ## Status report
 
-- **DONE:** 12
-- **DOING:** 1
-- **TODO:** 27
-- **Last updated:** 2026-10-09T17:23:21Z
+- **DONE:** 14
+- **DOING:** 0
+- **TODO:** 26
+- **Last updated:** 2026-10-09T17:26:44Z
 - **Counting rule:** counts include every task and subtask record, including parent workstreams.
 
 ## Tasks
@@ -68,9 +68,10 @@
 
 ### T020 — Establish the Kotlin/JVM application and API
 
-- **Status:** DOING
+- **Status:** DONE
 - **begin_datetime:** 2026-10-09T17:17:53Z
-- **resolution_datetime:** null
+- **resolution_datetime:** 2026-10-09T17:26:44Z
+- **Notes:** Established the JVM 17 Gradle app, standalone JAR tasks, Kotlin request/result API, CLI contract, and FFI boundary.
 
 #### T020.1 — Create the Gradle Kotlin DSL project and distribution task
 
@@ -88,9 +89,10 @@
 
 #### T020.3 — Define the stable C ABI and JVM bridge lifecycle
 
-- **Status:** TODO
-- **begin_datetime:** null
-- **resolution_datetime:** null
+- **Status:** DONE
+- **begin_datetime:** 2026-10-09T17:25:14Z
+- **resolution_datetime:** 2026-10-09T17:26:44Z
+- **Notes:** Defined tinycc_main(int argc, char *argv[]) as the exported C ABI, with UTF-8 arguments, exit-code/error behavior, Java/JAR discovery, and child-JVM lifecycle. Clarified that Windows DllMain is a separate loader callback.
 
 ### T030 — Build host-native compiler tool bundles
 

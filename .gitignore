@@ -13,6 +13,7 @@ local.properties
 .project
 .classpath
 .settings/
+bin/
 out/
 cmake-build-*/
 
