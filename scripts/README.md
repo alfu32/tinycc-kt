@@ -8,7 +8,7 @@ The repository currently has no Gradle build, Kotlin compiler entry point, or na
 
 `matrix.toml` defines six host OS/architecture profiles and six target profiles. The valid initial action set contains 31 pairs: all 30 Linux/Windows target combinations plus the native macOS-host to Darwin-target pair. Apple SDK terms restrict use of that SDK to Apple-branded macOS hardware, so the public matrix does not cross-build Darwin from Linux or Windows. Target ABI dependencies are attached to target profiles; native ABI dependencies are attached to the host package. A pair's dependency set is the union of its host and target requirements.
 
-Linux FFI shared libraries need extra care. A shared object loaded into a JVM/Python process must match that process's libc. Each Linux host package therefore needs glibc and musl bridge variants if both JVM environments are in scope. The standalone Clang/LLD executables can be built as static musl executables to avoid a glibc dependency. This libc split does not create extra host-target pairs; it creates two FFI bridge files inside each Linux host package.
+Linux FFI libraries must match the libc used by the hosting JVM or FFI caller. Ship two bridge variants for every Linux host architecture: one built for glibc and one for musl; do not try to make a single shared object span both ABIs. The Kotlin loader detects the process libc from `/proc/self/maps` (glibc's libc.so.6 versus musl's libc.musl-*.so.1). The `tinycc.native.libc=glibc|musl` system property overrides detection. If procfs is unavailable and no override is supplied, fail with a diagnostic instead of guessing. The standalone Clang/LLD executables remain static musl builds. These variants add files within each host package, not host-target pairs.
 
 The target profiles record a Windows ABI decision and a macOS SDK distribution gate:
 
@@ -50,9 +50,9 @@ When implementation begins, add one small entry script per pair under:
 scripts/pairs/<host-id>/<target-id>.py
 ```
 
-Each entry script delegates to shared Python modules in `scripts/lib/`; provisioning, cache keys, checksum validation, diagnostics, and archive layout must not be copied 36 times. Each pair script reads its host and target records from `matrix.toml`, provisions only pinned inputs, invokes the Gradle distribution task, and stages exactly one host-target package.
+Each entry script delegates to shared Python modules in `scripts/lib/`; provisioning, cache keys, checksum validation, diagnostics, and archive layout must not be copied once per matrix entry. Each pair script reads its host and target records from `matrix.toml`, provisions only pinned inputs, invokes the Gradle distribution task, and stages exactly one host-target package.
 
-The staged directory layout is identical for every pair (native file suffixes vary by OS):
+The staged directory layout is identical for every pair (native file suffixes vary by OS). The host-abi directory is glibc or musl for Linux and default for other hosts:
 
 ```text
 package/
@@ -60,7 +60,7 @@ package/
   bin/clang[.exe]
   bin/ld.lld[.exe]
   bin/llvm-ar[.exe]
-  native/<host-id>/libtinycc.<dll|so|dylib>
+  native/<host-id>/<host-abi>/libtinycc.<dll|so|dylib>
   targets/<target-id>/profile.json
   targets/<target-id>/sysroot/...
   licenses/

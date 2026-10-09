@@ -2,10 +2,10 @@
 
 ## Status report
 
-- **DONE:** 7
-- **DOING:** 1
-- **TODO:** 31
-- **Last updated:** 2026-10-09T17:14:49Z
+- **DONE:** 10
+- **DOING:** 0
+- **TODO:** 30
+- **Last updated:** 2026-10-09T17:16:40Z
 - **Counting rule:** counts include every task and subtask record, including parent workstreams.
 
 ## Tasks
@@ -33,10 +33,10 @@
 
 ### T010 — Finalize host and target support contracts
 
-- **Status:** DOING
+- **Status:** DONE
 - **begin_datetime:** null
-- **resolution_datetime:** null
-- **Notes:** Work began before task tracking; its exact start time is unavailable. Linux target profiles are recorded. Windows and macOS distribution constraints remain open.
+- **resolution_datetime:** 2026-10-09T17:16:40Z
+- **Notes:** Work began before task tracking; its exact start time is unavailable. Defined Linux musl targets, Windows GNU/UCRT targets with deferred MSVC profiles, the macOS SDK boundary, and Linux libc-specific FFI bridge variants.
 
 #### T010.1 — Define the initial Linux musl target profiles
 
@@ -61,10 +61,10 @@
 
 #### T010.4 — Finalize Linux host FFI ABI variants
 
-- **Status:** TODO
-- **begin_datetime:** null
-- **resolution_datetime:** null
-- **Notes:** Decide how the loader selects glibc versus musl shared-library bridges for the host JVM process.
+- **Status:** DONE
+- **begin_datetime:** 2026-10-09T17:15:35Z
+- **resolution_datetime:** 2026-10-09T17:16:03Z
+- **Notes:** Defined separate glibc and musl bridge variants for Linux hosts. The JVM loader detects the process libc through /proc/self/maps and supports the tinycc.native.libc system-property override; the package layout carries both variants.
 
 ### T020 — Establish the Kotlin/JVM application and API
 
