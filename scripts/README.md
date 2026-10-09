@@ -10,9 +10,9 @@ The repository currently has no Gradle build, Kotlin compiler entry point, or na
 
 Linux FFI shared libraries need extra care. A shared object loaded into a JVM/Python process must match that process's libc. Each Linux host package therefore needs glibc and musl bridge variants if both JVM environments are in scope. The standalone Clang/LLD executables can be built as static musl executables to avoid a glibc dependency. This libc split does not create extra host-target pairs; it creates two FFI bridge files inside each Linux host package.
 
-The first target list intentionally records two unresolved release gates:
+The target profiles record a Windows ABI decision and a macOS SDK distribution gate:
 
-* **Windows/MSVC:** Clang's MSVC target can be cross-linked from Linux with `lld-link`; the target sysroot needs Windows SDK, UCRT, and Visual C++ runtime headers/libraries. Microsoft redistribution rights must be checked for every shipped file. Keep MinGW-w64 + UCRT as the fallback profile if the required MSVC files cannot be included in the offline distribution.
+* **Windows:** Use the GNU Windows ABI with MinGW-w64 headers/startup objects and UCRT. LLVM-MinGW publishes Linux cross-toolchains for Windows x86_64 and AArch64, and documents UCRT as its primary runtime choice. UCRT is present in Windows 10 and later, which becomes our minimum Windows target. Microsoft permits redistribution of specified Visual Studio files but says not all files can be redistributed, so the MSVC sysroot remains deferred pending file-by-file license review. This is a conservative packaging decision, not a legal determination. See [Microsoft's redistribution list](https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution), [DLL redistribution guidance](https://learn.microsoft.com/en-us/cpp/windows/determining-which-dlls-to-redistribute?view=msvc-170), and [LLVM-MinGW](https://github.com/mstorsjo/llvm-mingw).
 * **macOS:** cross-linking normal hosted C programs needs macOS SDK headers and `libSystem` link stubs. GitHub's macOS runner can supply an SDK for CI, but that does not grant permission to place the SDK in our release. Until an allowed, project-owned replacement sysroot exists, the macOS target is marked `sdk_gate`; it cannot honestly be advertised as out-of-the-box on non-Mac hosts.
 
 Linux targets are the first fully specified target family. Build each musl sysroot from the musl source and build the matching compiler-rt builtins from the pinned LLVM source. Pin source revisions, checksums, and build options in the eventual lock file; never resolve `latest` during a release build.
@@ -23,10 +23,10 @@ Linux targets are the first fully specified target family. Build each musl sysro
 |---|---|---|
 | Kotlin/JVM compiler application | This repository's Gradle distribution task (to be added) | The JAR is host-independent. The build currently does not exist. |
 | JNI/FFI bridge headers and JVM ABI | Eclipse Temurin JDK from [Adoptium](https://adoptium.net/temurin/releases/) in CI | Build one bridge per native host ABI. The end-user JVM remains a runtime requirement. |
-| Clang, LLVM backends, LLD, compiler-rt | Pinned release/source from [llvm/llvm-project](https://github.com/llvm/llvm-project) | Build a host-native tool bundle with X86, AArch64, and RISCV backends. Use `lld-link` for MSVC-style COFF links. |
+| Clang, LLVM backends, LLD, compiler-rt | Pinned release/source from [llvm/llvm-project](https://github.com/llvm/llvm-project) | Build a host-native tool bundle with X86, AArch64, and RISCV backends. |
 | Linux C runtime | Pinned source from [musl](https://git.musl-libc.org/cgit/musl/) | Build headers, startup objects, libc, and linker metadata for x86_64, AArch64, and RISC-V 64. Record the RISC-V ISA/ABI baseline in the target profile. |
-| Windows GNU fallback | [LLVM-MinGW](https://github.com/mstorsjo/llvm-mingw) or pinned `mingw-w64` sources | Use only if the MSVC bundle fails its redistribution review. Select UCRT explicitly. |
-| Windows MSVC sysroot | Windows SDK and Visual Studio Build Tools components from Microsoft's official distribution channels | A Windows runner can provision the files for CI. Cross-host use still requires the sysroot in each package. Redistribution is a release gate, not assumed permission. |
+| Windows GNU/UCRT target sysroot | Pinned [LLVM-MinGW](https://github.com/mstorsjo/llvm-mingw), [mingw-w64](https://www.mingw-w64.org/), and LLVM sources | Build x86_64 and AArch64 target headers, startup objects, import libraries, and compiler-rt. Target Windows 10 or later, where UCRT is present. |
+| Deferred Windows MSVC sysroot | Windows SDK and Visual Studio Build Tools components from Microsoft's official distribution channels | Do not include in release packages until a file-by-file redistribution review clears all shipped headers, libraries, and runtime files. |
 | macOS SDK | Xcode image on a macOS GitHub runner, for CI-only validation | Do not include it in release artifacts unless Apple licensing permits that distribution. A custom public-API subset would be a separately scoped target profile. |
 
 ## Host build requirements

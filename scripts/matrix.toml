@@ -73,25 +73,27 @@ isa_abi_baseline = "must-be-pinned (for example rv64gc/lp64d)"
 provision_from = ["https://git.musl-libc.org/cgit/musl/", "https://github.com/llvm/llvm-project"]
 requires = ["musl headers", "musl libc", "crt startup objects", "compiler-rt builtins", "RISC-V ISA/ABI baseline", "LLD ELF support"]
 
-[targets.windows_x86_64_msvc]
+[targets.windows_x86_64_mingw_ucrt]
 os = "windows"
 arch = "x86_64"
-abi = "msvc"
-llvm_triple = "x86_64-pc-windows-msvc"
-status = "redistribution-review-required"
-provision_from = ["https://developer.microsoft.com/windows/downloads/windows-sdk/", "https://visualstudio.microsoft.com/downloads/", "https://github.com/llvm/llvm-project"]
-requires = ["Windows SDK headers/import libraries", "UCRT headers/libraries", "VCRuntime headers/libraries or an explicitly chosen static CRT", "compiler-rt builtins", "LLD COFF support"]
-fallback_target = "windows_x86_64_mingw_ucrt"
+abi = "gnu-windows"
+llvm_triple = "x86_64-w64-windows-gnu"
+crt = "ucrt"
+minimum_os = "Windows 10"
+status = "source-build-required"
+provision_from = ["https://github.com/mstorsjo/llvm-mingw", "https://github.com/llvm/llvm-project"]
+requires = ["mingw-w64 headers", "UCRT import libraries", "CRT startup objects", "compiler-rt builtins", "LLD COFF support"]
 
-[targets.windows_aarch64_msvc]
+[targets.windows_aarch64_mingw_ucrt]
 os = "windows"
 arch = "aarch64"
-abi = "msvc"
-llvm_triple = "aarch64-pc-windows-msvc"
-status = "redistribution-review-required"
-provision_from = ["https://developer.microsoft.com/windows/downloads/windows-sdk/", "https://visualstudio.microsoft.com/downloads/", "https://github.com/llvm/llvm-project"]
-requires = ["Windows ARM64 SDK headers/import libraries", "UCRT headers/libraries", "VCRuntime ARM64 headers/libraries or an explicitly chosen static CRT", "compiler-rt builtins", "LLD COFF support"]
-fallback_target = "windows_aarch64_mingw_ucrt"
+abi = "gnu-windows"
+llvm_triple = "aarch64-w64-windows-gnu"
+crt = "ucrt"
+minimum_os = "Windows 10"
+status = "source-build-required"
+provision_from = ["https://github.com/mstorsjo/llvm-mingw", "https://github.com/llvm/llvm-project"]
+requires = ["mingw-w64 headers", "UCRT import libraries", "CRT startup objects", "compiler-rt builtins", "LLD COFF support"]
 
 [targets.macos_aarch64_darwin]
 os = "macos"
@@ -102,25 +104,21 @@ status = "sdk-redistribution-gate"
 provision_from = ["Xcode/macOS SDK on GitHub macOS runner (CI-only pending rights review)", "https://github.com/llvm/llvm-project"]
 requires = ["macOS SDK headers", "libSystem .tbd link stubs", "deployment target", "LLD Mach-O support"]
 
-[fallback_targets.windows_x86_64_mingw_ucrt]
+[deferred_targets.windows_x86_64_msvc]
 os = "windows"
 arch = "x86_64"
-abi = "gnu-windows"
-llvm_triple_form = "x86_64-w64-windows-gnu"
-crt = "ucrt"
-status = "fallback-if-msvc-redistribution-blocked"
-provision_from = ["https://github.com/mstorsjo/llvm-mingw"]
-requires = ["mingw-w64 headers", "UCRT libraries", "startup objects", "compiler-rt builtins", "LLD COFF support"]
+abi = "msvc"
+llvm_triple = "x86_64-pc-windows-msvc"
+status = "deferred-redistribution-review"
+requires = ["Windows SDK headers/import libraries", "UCRT headers/libraries", "VCRuntime headers/libraries", "compiler-rt builtins", "LLD COFF support"]
 
-[fallback_targets.windows_aarch64_mingw_ucrt]
+[deferred_targets.windows_aarch64_msvc]
 os = "windows"
 arch = "aarch64"
-abi = "gnu-windows"
-llvm_triple_form = "aarch64-w64-windows-gnu"
-crt = "ucrt"
-status = "fallback-if-msvc-redistribution-blocked"
-provision_from = ["https://github.com/mstorsjo/llvm-mingw"]
-requires = ["mingw-w64 headers", "UCRT libraries", "startup objects", "compiler-rt builtins", "LLD COFF support"]
+abi = "msvc"
+llvm_triple = "aarch64-pc-windows-msvc"
+status = "deferred-redistribution-review"
+requires = ["Windows ARM64 SDK headers/import libraries", "UCRT headers/libraries", "VCRuntime ARM64 headers/libraries", "compiler-rt builtins", "LLD COFF support"]
 
 # Explicit valid Cartesian product: 6 hosts × 6 target profiles.
 [matrix]
@@ -128,37 +126,37 @@ pairs = [
   { host = "linux_x86_64", target = "linux_x86_64_musl" },
   { host = "linux_x86_64", target = "linux_aarch64_musl" },
   { host = "linux_x86_64", target = "linux_riscv64_musl" },
-  { host = "linux_x86_64", target = "windows_x86_64_msvc" },
-  { host = "linux_x86_64", target = "windows_aarch64_msvc" },
+  { host = "linux_x86_64", target = "windows_x86_64_mingw_ucrt" },
+  { host = "linux_x86_64", target = "windows_aarch64_mingw_ucrt" },
   { host = "linux_x86_64", target = "macos_aarch64_darwin" },
   { host = "linux_aarch64", target = "linux_x86_64_musl" },
   { host = "linux_aarch64", target = "linux_aarch64_musl" },
   { host = "linux_aarch64", target = "linux_riscv64_musl" },
-  { host = "linux_aarch64", target = "windows_x86_64_msvc" },
-  { host = "linux_aarch64", target = "windows_aarch64_msvc" },
+  { host = "linux_aarch64", target = "windows_x86_64_mingw_ucrt" },
+  { host = "linux_aarch64", target = "windows_aarch64_mingw_ucrt" },
   { host = "linux_aarch64", target = "macos_aarch64_darwin" },
   { host = "linux_riscv64", target = "linux_x86_64_musl" },
   { host = "linux_riscv64", target = "linux_aarch64_musl" },
   { host = "linux_riscv64", target = "linux_riscv64_musl" },
-  { host = "linux_riscv64", target = "windows_x86_64_msvc" },
-  { host = "linux_riscv64", target = "windows_aarch64_msvc" },
+  { host = "linux_riscv64", target = "windows_x86_64_mingw_ucrt" },
+  { host = "linux_riscv64", target = "windows_aarch64_mingw_ucrt" },
   { host = "linux_riscv64", target = "macos_aarch64_darwin" },
   { host = "macos_aarch64", target = "linux_x86_64_musl" },
   { host = "macos_aarch64", target = "linux_aarch64_musl" },
   { host = "macos_aarch64", target = "linux_riscv64_musl" },
-  { host = "macos_aarch64", target = "windows_x86_64_msvc" },
-  { host = "macos_aarch64", target = "windows_aarch64_msvc" },
+  { host = "macos_aarch64", target = "windows_x86_64_mingw_ucrt" },
+  { host = "macos_aarch64", target = "windows_aarch64_mingw_ucrt" },
   { host = "macos_aarch64", target = "macos_aarch64_darwin" },
   { host = "windows_x86_64", target = "linux_x86_64_musl" },
   { host = "windows_x86_64", target = "linux_aarch64_musl" },
   { host = "windows_x86_64", target = "linux_riscv64_musl" },
-  { host = "windows_x86_64", target = "windows_x86_64_msvc" },
-  { host = "windows_x86_64", target = "windows_aarch64_msvc" },
+  { host = "windows_x86_64", target = "windows_x86_64_mingw_ucrt" },
+  { host = "windows_x86_64", target = "windows_aarch64_mingw_ucrt" },
   { host = "windows_x86_64", target = "macos_aarch64_darwin" },
   { host = "windows_aarch64", target = "linux_x86_64_musl" },
   { host = "windows_aarch64", target = "linux_aarch64_musl" },
   { host = "windows_aarch64", target = "linux_riscv64_musl" },
-  { host = "windows_aarch64", target = "windows_x86_64_msvc" },
-  { host = "windows_aarch64", target = "windows_aarch64_msvc" },
+  { host = "windows_aarch64", target = "windows_x86_64_mingw_ucrt" },
+  { host = "windows_aarch64", target = "windows_aarch64_mingw_ucrt" },
   { host = "windows_aarch64", target = "macos_aarch64_darwin" },
 ]

@@ -4,8 +4,8 @@
 
 - **DONE:** 6
 - **DOING:** 1
-- **TODO:** 33
-- **Last updated:** 2026-10-09T17:10:01Z
+- **TODO:** 32
+- **Last updated:** 2026-10-09T17:13:12Z
 - **Counting rule:** counts include every task and subtask record, including parent workstreams.
 
 ## Tasks
@@ -47,10 +47,10 @@
 
 #### T010.2 — Select a distributable Windows runtime profile
 
-- **Status:** TODO
-- **begin_datetime:** null
-- **resolution_datetime:** null
-- **Notes:** Check the exact Microsoft SDK/VC files needed for MSVC ABI output and their redistribution terms; use MinGW-w64 + UCRT if bundling the MSVC files is not viable.
+- **Status:** DONE
+- **begin_datetime:** 2026-10-09T17:11:35Z
+- **resolution_datetime:** 2026-10-09T17:13:12Z
+- **Notes:** Selected LLVM-MinGW with UCRT for GNU Windows x86_64/AArch64, targeting Windows 10 and later. MSVC profiles are deferred until a file-by-file redistribution review clears a self-contained sysroot.
 
 #### T010.3 — Define out-of-box macOS target support
 
