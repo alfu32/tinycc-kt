@@ -1,0 +1,39 @@
+# Gradle and Kotlin build output
+.gradle/
+**/build/
+local.properties
+
+# Kotlin / JVM generated files
+*.class
+
+# IDE metadata
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+out/
+cmake-build-*/
+
+# Python build-script caches and environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+ENV/
+
+# Local provisioning caches and generated release packages
+/.cache/
+/scripts/.cache/
+/artifacts/
+/dist/
+/packages/
+
+# Temporary files and logs
+*.tmp
+*.log
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
