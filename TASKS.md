@@ -2,10 +2,10 @@
 
 ## Status report
 
-- **DONE:** 5
+- **DONE:** 6
 - **DOING:** 1
 - **TODO:** 33
-- **Last updated:** 2026-10-09T17:07:14Z
+- **Last updated:** 2026-10-09T17:10:01Z
 - **Counting rule:** counts include every task and subtask record, including parent workstreams.
 
 ## Tasks
@@ -256,3 +256,10 @@
 - **begin_datetime:** 2026-10-09T17:06:55Z
 - **resolution_datetime:** 2026-10-09T17:07:02Z
 - **Notes:** Ignores Gradle/Kotlin and IDE output, Python script caches, and generated build packages.
+
+### T091 — Commit each completed task
+
+- **Status:** DONE
+- **begin_datetime:** 2026-10-09T17:09:56Z
+- **resolution_datetime:** 2026-10-09T17:10:01Z
+- **Notes:** Add the per-task commit requirement to the agent management rules.

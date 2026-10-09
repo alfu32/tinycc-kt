@@ -8,6 +8,7 @@
 - Store datetimes as ISO 8601 UTC timestamps (`YYYY-MM-DDTHH:MM:SSZ`). For `TODO`, both datetime fields are `null`. For `DOING`, record the start and leave resolution `null`. For `DONE`, record both. If historical work predates this register and a timestamp cannot be established reliably, use `null` and state that in the task note instead of guessing.
 - Count every task and subtask record, including parent workstreams, in the report totals. Keep parent statuses consistent with their subtasks and recalculate the report whenever any task status changes.
 - Update `TASKS.md` when work starts, changes status, completes, or acquires new subtasks. Keep remaining implementation, research, and validation steps visible as `TODO` items.
+- Commit each completed task as its own focused commit after updating its implementation and task-register status. Use the required Conventional Commits message format for every commit.
 
 ## Response and commit message specification
 
